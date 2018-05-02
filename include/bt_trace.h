@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- *  Copyright (C) 1999-2012 Broadcom Corporation
+ *  Copyright 1999-2012 Broadcom Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -719,4 +719,44 @@ void LogMsg(uint32_t trace_set_mask, const char* fmt_str, ...);
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __cplusplus
+
+#include <iomanip>
+#include <sstream>
+#include <type_traits>
+
+#include <base/logging.h>
+
+/* Prints intergral parameter x as hex string, with '0' fill */
+template <typename T>
+std::string loghex(T x) {
+  static_assert(std::is_integral<T>::value,
+                "loghex parameter must be integral.");
+  std::stringstream tmp;
+  tmp << std::showbase << std::internal << std::hex << std::setfill('0')
+      << std::setw((sizeof(T) * 2) + 2) << +x;
+  return tmp.str();
+}
+
+/**
+ * Append a field name to a string.
+ *
+ * The field names are added to the string with "|" in between.
+ *
+ * @param p_result a pointer to the result string to add the field name to
+ * @param append if true the field name will be added
+ * @param name the field name to add
+ * @return the result string
+ */
+inline std::string& AppendField(std::string* p_result, bool append,
+                                const std::string& name) {
+  CHECK(p_result != nullptr);
+  if (!append) return *p_result;
+  if (!p_result->empty()) *p_result += "|";
+  *p_result += name;
+  return *p_result;
+}
+
 #endif

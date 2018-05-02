@@ -295,6 +295,10 @@ static tA2DP_STATUS bta_av_audio_sink_getconfig(
   APPL_TRACE_DEBUG("%s: num_protect:0x%02x protect_info:0x%02x%02x%02x",
                    __func__, *p_num_protect, p_protect_info[0],
                    p_protect_info[1], p_protect_info[2]);
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_codec_info).c_str());
+
+  // Find the peer
 
   /* Retrieve the peer info */
   p_peer = bta_av_co_get_peer(hndl);
@@ -395,7 +399,7 @@ tA2DP_STATUS bta_av_co_audio_getconfig(tBTA_AV_HNDL hndl, uint8_t* p_codec_info,
   tBTA_AV_CO_PEER* p_peer;
 
   APPL_TRACE_DEBUG("%s", __func__);
-  A2DP_DumpCodecInfo(p_codec_info);
+  //A2DP_DumpCodecInfo(p_codec_info);
 
   /* Retrieve the peer info */
   p_peer = bta_av_co_get_peer(hndl);
@@ -508,7 +512,8 @@ void bta_av_co_audio_setconfig(tBTA_AV_HNDL hndl, const uint8_t* p_codec_info,
   APPL_TRACE_DEBUG("num_protect:0x%02x protect_info:0x%02x%02x%02x",
                    num_protect, p_protect_info[0], p_protect_info[1],
                    p_protect_info[2]);
-  A2DP_DumpCodecInfo(p_codec_info);
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_codec_info).c_str());
 
   /* Retrieve the peer info */
   p_peer = bta_av_co_get_peer(hndl);
@@ -995,7 +1000,7 @@ static void bta_av_co_save_new_codec_config(tBTA_AV_CO_PEER* p_peer,
                                             uint8_t num_protect,
                                             const uint8_t* p_protect_info) {
   APPL_TRACE_DEBUG("%s", __func__);
-  A2DP_DumpCodecInfo(new_codec_config);
+  //A2DP_DumpCodecInfo(new_codec_config);
 
   // Protect access to bta_av_co_cb.codec_config
   mutex_global_lock();
@@ -1181,8 +1186,10 @@ static bool bta_av_co_set_codec_ota_config(tBTA_AV_CO_PEER* p_peer,
   bool restart_output = false;
   bool config_updated = false;
 
-  APPL_TRACE_DEBUG("%s", __func__);
-  A2DP_DumpCodecInfo(p_ota_codec_config);
+  APPL_TRACE_DEBUG("%s: peer_address=%s", __func__,
+                   p_peer->addr.ToString().c_str());
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_ota_codec_config).c_str());
 
   *p_restart_output = false;
 
@@ -1221,7 +1228,8 @@ static bool bta_av_co_set_codec_ota_config(tBTA_AV_CO_PEER* p_peer,
 
   if (restart_output) {
     APPL_TRACE_DEBUG("%s: restart output", __func__);
-    A2DP_DumpCodecInfo(result_codec_config);
+    APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                     A2DP_CodecInfoString(result_codec_config).c_str());
 
     *p_restart_output = true;
     p_peer->p_sink = p_sink;
