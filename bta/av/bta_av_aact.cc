@@ -1110,8 +1110,10 @@ void bta_av_config_ind(tBTA_AV_SCB* p_scb, tBTA_AV_DATA* p_data) {
   local_sep = bta_av_get_scb_sep_type(p_scb, p_msg->handle);
   p_scb->avdt_label = p_data->str_msg.msg.hdr.label;
 
-  APPL_TRACE_DEBUG("%s: local_sep = %d", __func__, local_sep);
-  A2DP_DumpCodecInfo(p_evt_cfg->codec_info);
+  APPL_TRACE_DEBUG("%s: peer %s handle:%d local_sep:%d", __func__,
+                   p_scb->peer_addr.ToString().c_str(), p_scb->hndl, local_sep);
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_evt_cfg->codec_info).c_str());
 
   memcpy(p_scb->cfg.codec_info, p_evt_cfg->codec_info, AVDT_CODEC_SIZE);
   bta_av_save_addr(p_scb, p_data->str_msg.bd_addr);
@@ -1663,9 +1665,12 @@ void bta_av_save_caps(tBTA_AV_SCB* p_scb, tBTA_AV_DATA* p_data) {
   uint8_t old_wait = p_scb->wait;
   bool getcap_done = false;
 
-  APPL_TRACE_DEBUG("%s: num_seps:%d sep_info_idx:%d wait:x%x", __func__,
-                   p_scb->num_seps, p_scb->sep_info_idx, p_scb->wait);
-  A2DP_DumpCodecInfo(p_scb->p_cap->codec_info);
+  APPL_TRACE_DEBUG(
+      "%s: peer %s handle:%d num_seps:%d sep_info_idx:%d wait:0x%x", __func__,
+      p_scb->peer_addr.ToString().c_str(), p_scb->hndl, p_scb->num_seps,
+      p_scb->sep_info_idx, p_scb->wait);
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_scb->p_cap->codec_info).c_str());
 
   memcpy(&cfg, p_scb->p_cap, sizeof(tAVDT_CFG));
   /* let application know the capability of the SNK */
@@ -1675,7 +1680,8 @@ void bta_av_save_caps(tBTA_AV_SCB* p_scb, tBTA_AV_DATA* p_data) {
   p_scb->sep_info_idx++;
   APPL_TRACE_DEBUG("%s: result: sep_info_idx:%d", __func__,
                    p_scb->sep_info_idx);
-  A2DP_DumpCodecInfo(cfg.codec_info);
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(cfg.codec_info).c_str());
 
   if (p_scb->num_seps > p_scb->sep_info_idx) {
     /* Some devices have seps at the end of the discover list, which is not */
@@ -1816,7 +1822,8 @@ void bta_av_getcap_results(tBTA_AV_SCB* p_scb, tBTA_AV_DATA* p_data) {
   APPL_TRACE_DEBUG("%s: num_codec %d", __func__, p_scb->p_cap->num_codec);
   APPL_TRACE_DEBUG("%s: media type x%x, x%x", __func__, media_type,
                    p_scb->media_type);
-  A2DP_DumpCodecInfo(p_scb->cfg.codec_info);
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_scb->cfg.codec_info).c_str());
 
   /* if codec present and we get a codec configuration */
   if ((p_scb->p_cap->num_codec != 0) && (media_type == p_scb->media_type) &&
@@ -1828,7 +1835,8 @@ void bta_av_getcap_results(tBTA_AV_SCB* p_scb, tBTA_AV_DATA* p_data) {
 
     APPL_TRACE_DEBUG("%s: result: sep_info_idx=%d", __func__,
                      p_scb->sep_info_idx);
-    A2DP_DumpCodecInfo(p_scb->cfg.codec_info);
+    APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                     A2DP_CodecInfoString(p_scb->cfg.codec_info).c_str());
 
     uuid_int = p_scb->uuid_int;
     APPL_TRACE_DEBUG("%s: initiator UUID = 0x%x", __func__, uuid_int);
@@ -2106,9 +2114,12 @@ void bta_av_reconfig(tBTA_AV_SCB* p_scb, tBTA_AV_DATA* p_data) {
   APPL_TRACE_DEBUG(
       "%s: p_scb->sep_info_idx=%d p_scb->rcfg_idx=%d p_rcfg->sep_info_idx=%d",
       __func__, p_scb->sep_info_idx, p_scb->rcfg_idx, p_rcfg->sep_info_idx);
-  A2DP_DumpCodecInfo(p_scb->p_cap->codec_info);
-  A2DP_DumpCodecInfo(p_scb->cfg.codec_info);
-  A2DP_DumpCodecInfo(p_rcfg->codec_info);
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_scb->p_cap->codec_info).c_str());
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_scb->cfg.codec_info).c_str());
+  APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                   A2DP_CodecInfoString(p_rcfg->codec_info).c_str());
 
   p_cfg->num_protect = p_rcfg->num_protect;
   memcpy(p_cfg->codec_info, p_rcfg->codec_info, AVDT_CODEC_SIZE);
@@ -2131,7 +2142,8 @@ void bta_av_reconfig(tBTA_AV_SCB* p_scb, tBTA_AV_DATA* p_data) {
     } else {
       // Reconfigure
       APPL_TRACE_DEBUG("%s: reconfig", __func__);
-      A2DP_DumpCodecInfo(p_scb->cfg.codec_info);
+      APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                       A2DP_CodecInfoString(p_scb->cfg.codec_info).c_str());
       AVDT_ReconfigReq(p_scb->avdt_handle, &p_scb->cfg);
       p_scb->cfg.psc_mask = p_scb->cur_psc_mask;
     }
@@ -2827,7 +2839,8 @@ void bta_av_suspend_cont(tBTA_AV_SCB* p_scb, tBTA_AV_DATA* p_data) {
     APPL_TRACE_DEBUG("%s: calling AVDT_ReconfigReq", __func__);
     /* reconfig the stream */
 
-    A2DP_DumpCodecInfo(p_scb->cfg.codec_info);
+    APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                     A2DP_CodecInfoString(p_scb->cfg.codec_info).c_str());
     AVDT_ReconfigReq(p_scb->avdt_handle, &p_scb->cfg);
     p_scb->cfg.psc_mask = p_scb->cur_psc_mask;
   }
@@ -2910,7 +2923,8 @@ void bta_av_rcfg_open(tBTA_AV_SCB* p_scb, UNUSED_ATTR tBTA_AV_DATA* p_data) {
                      bta_av_dt_cback[p_scb->hdi]);
   } else {
     APPL_TRACE_DEBUG("%s: calling AVDT_OpenReq()", __func__);
-    A2DP_DumpCodecInfo(p_scb->cfg.codec_info);
+    APPL_TRACE_DEBUG("%s: codec: %s", __func__,
+                     A2DP_CodecInfoString(p_scb->cfg.codec_info).c_str());
 
     /* we may choose to use a different SEP at reconfig.
      * adjust the sep_idx now */
